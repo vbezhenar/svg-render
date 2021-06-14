@@ -1,0 +1,163 @@
+<!doctype html>
+<title>SVG Render</title>
+
+<a style="float: right" href="https://github.com/vbezhenar/svg-render">https://github.com/vbezhenar/svg-render</a>
+<label>
+    Select SVG file:
+    <input id=file type=file accept=.svg>
+</label>
+<hr/>
+<div id=results>
+    <label>
+        Size:
+        <select id=width>
+            <option value=auto selected>Auto</option>
+            <option>16</option>
+            <option>32</option>
+            <option>48</option>
+            <option>64</option>
+            <option>96</option>
+            <option>128</option>
+            <option>192</option>
+            <option>256</option>
+            <option>512</option>
+            <option>1024</option>
+            <option value=custom>Custom</option>
+        </select>
+        <input id=width-custom type=number min=1 max=16318 value=100>
+        &cross;
+        <select id=height>
+            <option value=auto selected>Auto</option>
+            <option>16</option>
+            <option>32</option>
+            <option>48</option>
+            <option>64</option>
+            <option>96</option>
+            <option>128</option>
+            <option>192</option>
+            <option>256</option>
+            <option>512</option>
+            <option>1024</option>
+            <option value=custom>Custom</option>
+        </select>
+        <input id=height-custom type=number min=1 max=16318 value=100>
+    </label><br/>
+    <br/>
+    <a id=download href=data:,>Download</a>
+    <div id=canvas-container>
+        <canvas id=canvas width=0 height=0></canvas>
+    </div>
+</div>
+
+<script>
+    const fileElement = document.getElementById("file");
+    const resultsElement = document.getElementById("results");
+    const widthElement = document.getElementById("width");
+    const widthCustomElement = document.getElementById("width-custom");
+    const heightElement = document.getElementById("height");
+    const heightCustomElement = document.getElementById("height-custom");
+    const downloadElement = document.getElementById("download");
+    const canvasElement = document.getElementById("canvas");
+
+    let width;
+    let height;
+    let baseFileName = null;
+    let svgImage = null;
+
+    fileElement.onchange = fileChange;
+    widthElement.onchange = updateDimensions;
+    heightElement.onchange = updateDimensions;
+    widthCustomElement.onchange = updateDimensions;
+    heightCustomElement.onchange = updateDimensions;
+    downloadElement.onclick = downloadClick;
+
+    updateDimensions();
+
+    function fileChange(event) {
+        svgImage = null;
+        resultsElement.style.display = "none";
+        canvasElement.width = canvasElement.height = 0;
+
+        const fileElement = event.target;
+        if (fileElement.files.length > 0) {
+            fileElement.disabled = true;
+            const file = fileElement.files[0];
+            const fileName = file.name;
+            const dotIndex = fileName.lastIndexOf(".");
+            baseFileName = dotIndex >= 0 ? fileName.substring(0, dotIndex) : fileName;
+            const fileReader = new FileReader();
+            fileReader.onload = fileReaderLoaded;
+            fileReader.readAsDataURL(file);
+        }
+    }
+
+    function fileReaderLoaded(event) {
+        const fileReader = event.target;
+        fileElement.disabled = false;
+        svgImage = new Image();
+        svgImage.onload = svgImageLoaded;
+        svgImage.src = fileReader.result;
+    }
+
+    function svgImageLoaded(event) {
+        if (event.target !== svgImage) {
+            return;
+        }
+        updateCanvas();
+        resultsElement.style.display = "";
+    }
+
+    function updateDimensions() {
+        width = widthElement.value;
+        if (width === "custom") {
+            widthCustomElement.style.display = "";
+            if (!(widthCustomElement.min <= widthCustomElement.value
+                && widthCustomElement.value <= widthCustomElement.max)) {
+                widthCustomElement.value = widthCustomElement.getAttribute("value");
+            }
+            width = widthCustomElement.value;
+        } else {
+            widthCustomElement.style.display = "none";
+        }
+
+        height = heightElement.value;
+        if (height === "custom") {
+            heightCustomElement.style.display = "";
+            if (!(heightCustomElement.min <= heightCustomElement.value
+                && heightCustomElement.value <= heightCustomElement.max)) {
+                heightCustomElement.value = heightCustomElement.getAttribute("value");
+            }
+            height = heightCustomElement.value;
+        } else {
+            heightCustomElement.style.display = "none";
+        }
+
+        if (svgImage != null) {
+            updateCanvas();
+        }
+    }
+
+    function updateCanvas() {
+        let canvasWidth = width;
+        let canvasHeight = height;
+        if (canvasWidth === "auto" && canvasHeight === "auto") {
+            canvasWidth = svgImage.width;
+            canvasHeight = svgImage.height;
+        } else if (canvasWidth === "auto") {
+            // canvasWidth / canvasHeight = width / height
+            canvasWidth = Math.ceil(svgImage.width * canvasHeight / svgImage.height);
+        } else if (canvasHeight === "auto") {
+            canvasHeight = Math.ceil(svgImage.height * canvasWidth / svgImage.width);
+        }
+
+        canvasElement.width = canvasWidth;
+        canvasElement.height = canvasHeight;
+        const context = canvas.getContext("2d");
+        context.drawImage(svgImage, 0, 0, canvasWidth, canvasHeight);
+    }
+
+    function downloadClick() {
+        downloadElement.href = canvasElement.toDataURL("image/png");
+        downloadElement.download = `${baseFileName}_${canvas.width}x${canvas.height}.png`;
+    }
+</script>

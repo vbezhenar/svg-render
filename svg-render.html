@@ -10,7 +10,7 @@
     <input id=file type=file accept=.svg>
 </label>
 <hr/>
-<div id=results>
+<div id=results style="display: none">
     <div>
         Size:
         <select id=width>
@@ -44,12 +44,10 @@
             <option value=custom>Custom</option>
         </select>
         <input id=height-custom type=number min=1 max=16318 value=100>
-    </div><br/>
-    <br/>
-    <a id=download href=data:,>Download</a>
-    <div id=canvas-container>
-        <canvas id=canvas width=0 height=0></canvas>
+        <a id=download href=data:,>Download</a>
     </div>
+    <hr/>
+    <canvas id=canvas width=0 height=0></canvas>
 </div>
 
 <script>
@@ -72,7 +70,6 @@
     heightElement.onchange = updateDimensions;
     widthCustomElement.onchange = updateDimensions;
     heightCustomElement.onchange = updateDimensions;
-    downloadElement.onclick = downloadClick;
 
     updateDimensions();
 
@@ -157,9 +154,7 @@
         canvasElement.height = canvasHeight;
         const context = canvas.getContext("2d");
         context.drawImage(svgImage, 0, 0, canvasWidth, canvasHeight);
-    }
-
-    function downloadClick() {
+        downloadElement.innerText = `Download ${baseFileName}_${canvas.width}x${canvas.height}.png`
         downloadElement.href = canvasElement.toDataURL("image/png");
         downloadElement.download = `${baseFileName}_${canvas.width}x${canvas.height}.png`;
     }

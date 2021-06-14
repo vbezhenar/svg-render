@@ -1,4 +1,7 @@
 <!doctype html>
+
+<html lang=en>
+<meta charset=utf-8>
 <title>SVG Render</title>
 
 <a style="float: right" href="https://github.com/vbezhenar/svg-render">https://github.com/vbezhenar/svg-render</a>
@@ -8,7 +11,7 @@
 </label>
 <hr/>
 <div id=results>
-    <label>
+    <div>
         Size:
         <select id=width>
             <option value=auto selected>Auto</option>
@@ -41,7 +44,7 @@
             <option value=custom>Custom</option>
         </select>
         <input id=height-custom type=number min=1 max=16318 value=100>
-    </label><br/>
+    </div><br/>
     <br/>
     <a id=download href=data:,>Download</a>
     <div id=canvas-container>
@@ -161,3 +164,4 @@
         downloadElement.download = `${baseFileName}_${canvas.width}x${canvas.height}.png`;
     }
 </script>
+</html>

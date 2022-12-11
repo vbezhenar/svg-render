@@ -16,9 +16,11 @@
         <select id=width>
             <option value=auto selected>Auto</option>
             <option>16</option>
+            <option>24</option>
             <option>32</option>
             <option>48</option>
             <option>64</option>
+            <option>72</option>
             <option>96</option>
             <option>128</option>
             <option>192</option>
@@ -32,9 +34,11 @@
         <select id=height>
             <option value=auto selected>Auto</option>
             <option>16</option>
+            <option>24</option>
             <option>32</option>
             <option>48</option>
             <option>64</option>
+            <option>72</option>
             <option>96</option>
             <option>128</option>
             <option>192</option>
@@ -154,9 +158,11 @@
         canvasElement.height = canvasHeight;
         const context = canvas.getContext("2d");
         context.drawImage(svgImage, 0, 0, canvasWidth, canvasHeight);
-        downloadElement.innerText = `Download ${baseFileName}_${canvas.width}x${canvas.height}.png`
+        const fileNameSuffix = canvas.width === canvas.height ? `_${canvas.width}` : `_${canvas.width}x${canvas.height}`;
+        const fileName = `${baseFileName}${fileNameSuffix}.png`;
+        downloadElement.innerText = `Download ${fileName}`;
         downloadElement.href = canvasElement.toDataURL("image/png");
-        downloadElement.download = `${baseFileName}_${canvas.width}x${canvas.height}.png`;
+        downloadElement.download = fileName;
     }
 </script>
 </html>
